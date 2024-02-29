@@ -4,5 +4,3 @@ make
 
 
 ## Question à poser :
-
-- La grammaire de **mot_simple** existe-t-elle ou nous devons la créer ?
