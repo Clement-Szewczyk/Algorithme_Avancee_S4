@@ -20,18 +20,33 @@ int main()
     printf("\nTest de la fonction passer_espace() :\n");
     passer_espace(); // Test de la fonction passer_espace() pour ignorer les espaces, tabulations et retours à la ligne
 
+    printf("\nTest de la fonction annexes() :\n");
+    annexes(); // Test de la fonction annexes()
+
+    printf("\nTest de la fonction contenu_annexe() :\n");
+    contenu_annexe(); // Test de la fonction contenu_annexe()
+
+    printf("\nTest de la fonction item() :\n");
+    item(); // Test de la fonction item()
+
+    printf("\nTest de la fonction liste_texte() :\n");
+    liste_texte(); // Test de la fonction liste_texte()
+
+    printf("\nTest de la fonction texte_liste() :\n");
+    texte_liste(); // Test de la fonction texte_liste()
+
+    printf("\nTest de la fonction mot_enrichi() :\n");
+    mot_enrichi(); // Test de la fonction mot_enrichi()
+
+    printf("\nTest de la fonction mot_simple() :\n");
+    mot_simple(); // Test de la fonction mot_simple()
+
     // PROBLEME ICI
     printf("\nTest de la fonction text_enrichi() :\n");
     text_enrichi(); // Test de la fonction text_enrichi()
 
     printf("\nTest de la fonction document() :\n");
     document(); // Test de la fonction document()
-
-    printf("\nTest de la fonction annexes() :\n");
-    annexes(); // Test de la fonction annexes()
-
-    printf("\nTest de la fonction contenu_annexe() :\n");
-    contenu_annexe(); // Test de la fonction contenu_annexe()
 
     printf("\nTest de la fonction contenu() :\n");
     contenu(); // Test de la fonction contenu()
@@ -45,23 +60,8 @@ int main()
     printf("\nTest de la fonction liste() :\n");
     liste(); // Test de la fonction liste()
 
-    printf("\nTest de la fonction item() :\n");
-    item(); // Test de la fonction item()
-
-    printf("\nTest de la fonction liste_texte() :\n");
-    liste_texte(); // Test de la fonction liste_texte()
-
-    printf("\nTest de la fonction texte_liste() :\n");
-    texte_liste(); // Test de la fonction texte_liste()
-
     printf("\nTest de la fonction texte() :\n");
     texte(); // Test de la fonction texte()
-
-    printf("\nTest de la fonction mot_enrichi() :\n");
-    mot_enrichi(); // Test de la fonction mot_enrichi()
-
-    printf("\nTest de la fonction mot_simple() :\n");
-    mot_simple(); // Test de la fonction mot_simple()
 
     printf("\nTest de la fonction mot_important() :\n");
     mot_important(); // Test de la fonction mot_important()
