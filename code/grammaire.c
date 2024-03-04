@@ -8,7 +8,7 @@ char caractere;
 // Méthode permettant l'analyse d'un fichier
 void amorcer()
 {
-    fichier = fopen("exemple1.txt", "r");
+    fichier = fopen("exemple4.txt", "r");
     if (fichier == NULL)
     {
         fprintf(stderr, "Erreur lors de l'ouverture du fichier\n");
@@ -35,6 +35,11 @@ void consommer(char terminal)
 {
     if (caractere != terminal && caractere != '\n' && caractere != '\r' && caractere != '\t')
     {
+        if (caractere == EOF)
+        {
+            // Si nous atteignons la fin du fichier, ne pas afficher de message d'erreur
+            return;
+        }
         fprintf(stderr, "Erreur : caractère attendu : %c, caractère trouvé : %c\n", terminal, caractere);
         exit(1); // Quitter le programme en cas d'erreur
     }
@@ -51,8 +56,9 @@ void passer_espace()
 
 void text_enrichi()
 {
-    document();
-    annexes();
+    document();       // Lire le document principal
+    annexes();        // Lire les annexes
+    lire_caractere(); // Lire le caractère suivant après la fin des annexes
 }
 
 void document()
@@ -74,8 +80,8 @@ void annexes()
 
 void contenu_annexe()
 {
-    while (caractere != 'f')
-    { // Tant que le prochain caractère n'est pas la fin de l'annexe
+    while (caractere != '<' && caractere != EOF)
+    { // Tant que le prochain caractère n'est pas le début d'une nouvelle balise et que nous ne sommes pas à la fin du fichier
         if (caractere == 'd')
         {
             section(); // Vérifier si le contenu est une section
@@ -98,7 +104,7 @@ void contenu_annexe()
 void contenu()
 {
     while (caractere != 'd' && caractere != 'f')
-    { // Tant que le caractère n' est pas le début ou la fin d'une section
+    { // Tant que le caractère n'est pas le début ou la fin d'une section
         if (caractere == 'd')
         {              // Si le caractère est le début d'une section
             section(); // Lire et vérifier la structure de la section
@@ -116,6 +122,9 @@ void contenu()
             liste(); // Lire et vérifier la structure de la liste
         }
     }
+
+    // Consommer les caractères inutiles
+    passer_espace();
 }
 
 void section()
