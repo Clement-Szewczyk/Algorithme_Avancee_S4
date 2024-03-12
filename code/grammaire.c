@@ -24,11 +24,28 @@ void amorcer()
 // Méthode permettant de lire un caractère
 void lire_caractere()
 {
-    while ((caractere = fgetc(fichier)) != EOF)
+    do
+    {
+        caractere = fgetc(fichier);
+    } while (caractere == ' ' || caractere == '\n' || caractere == '\t' || caractere == '\r');
+
+    if (caractere == EOF)
+    {
+        if (feof(fichier))
+        {
+            printf("Fin du fichier atteinte\n");
+            fclose(fichier);
+        }
+        else
+        {
+            fprintf(stderr, "Erreur : erreur lors de la lecture du fichier\n");
+            exit(-1);
+        }
+    }
+    else
     {
         printf("%c", caractere);
     }
-    fclose(fichier);
 }
 
 void consommer(char terminal)
@@ -51,14 +68,18 @@ void passer_espace()
     while (caractere == ' ' || caractere == '\n' || caractere == '\t' || caractere == '\r')
     {
         lire_caractere();
+        if (caractere == EOF)
+        {
+            // Si nous atteignons la fin du fichier, ne pas continuer
+            return;
+        }
     }
 }
-
 void text_enrichi()
 {
     document();       // Lire le document principal
     annexes();        // Lire les annexes
-    lire_caractere(); // Lire le caractère suivant après la fin des annexes
+    lire_caractere(); // Lire le caractère suivant après les annexes
 }
 
 void document()
@@ -72,59 +93,59 @@ void annexes()
 {
     while (caractere != EOF && caractere == 'd')
     {
-        consommer('d');   // Consommer le début de l'annexe
-        contenu_annexe(); // Lire et vérifier la structure du contenu de l'annexe
-        consommer('f');   // Consommer la fin de l'annexe
+        consommer('d');
+        contenu_annexe();
+        consommer('f');
+        lire_caractere(); // Assurez-vous de lire le caractère suivant après chaque itération de la boucle
     }
 }
 
 void contenu_annexe()
 {
     while (caractere != '<' && caractere != EOF)
-    { // Tant que le prochain caractère n'est pas le début d'une nouvelle balise et que nous ne sommes pas à la fin du fichier
+    {
         if (caractere == 'd')
         {
-            section(); // Vérifier si le contenu est une section
+            section();
         }
         else if (caractere == 't')
         {
-            titre(); // Vérifier si le contenu est un titre
+            titre();
         }
         else if (caractere == 'r')
         {
-            mot_enrichi(); // Vérifier si le contenu est un mot enrichi
+            mot_enrichi();
         }
         else
         {
-            liste(); // Vérifier si le contenu est une liste
+            liste();
         }
+        lire_caractere(); // Mettre à jour le caractère suivant après chaque itération de la boucle
     }
 }
 
 void contenu()
 {
     while (caractere != 'd' && caractere != 'f')
-    { // Tant que le caractère n'est pas le début ou la fin d'une section
+    {
         if (caractere == 'd')
-        {              // Si le caractère est le début d'une section
-            section(); // Lire et vérifier la structure de la section
+        {
+            section();
         }
         else if (caractere == 't')
-        {            // Si le caractère est le début d'un titre
-            titre(); // Lire et vérifier la structure du titre
+        {
+            titre();
         }
         else if (caractere == 'r')
-        {                  // Si le caractère est un retour à la ligne
-            mot_enrichi(); // Lire et vérifier le contenu enrichi (retour à la ligne)
+        {
+            mot_enrichi();
         }
         else
         {
-            liste(); // Lire et vérifier la structure de la liste
+            liste();
         }
+        passer_espace(); // Assurez-vous de passer les espaces après chaque consommation de caractère
     }
-
-    // Consommer les caractères inutiles
-    passer_espace();
 }
 
 void section()
@@ -155,14 +176,15 @@ void item()
 {
     consommer('d'); // Consommer le début de l'item
     if (caractere == 'd' || caractere == 't' || caractere == 'r')
-    {                  // Si le prochain caractère est le début d'une liste, d'un titre ou un retour à la ligne
-        liste_texte(); // Lire et vérifier la structure du texte de l'item
+    {
+        liste_texte();
     }
     else
     {
-        texte_liste(); // Lire et vérifier la structure de la liste de l'item
+        texte_liste();
     }
-    consommer('f'); // Consommer la fin de l'item
+    consommer('f');   // Consommer la fin de l'item
+    lire_caractere(); // Ajout de la lecture du caractère suivant
 }
 
 void liste_texte()
@@ -177,9 +199,10 @@ void liste_texte()
 void texte_liste()
 {
     if (caractere == 'd' || caractere == 't' || caractere == 'r')
-    {            // Si le prochain caractère est le début d'une liste, d'un titre ou un retour à la ligne
-        liste(); // Lire et vérifier la structure de la liste
+    {
+        liste();
     }
+    lire_caractere(); // Ajout de la lecture du caractère suivant
 }
 
 void texte()
