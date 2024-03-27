@@ -16,8 +16,11 @@ typedef enum e_etiq
     fin_liste,
     debut_item,
     fin_item,
-    mot_simple,
-    mot_enrichi
+    item_texte,
+    item_liste,
+    mot_enrichi,
+    debut_important,
+    fin_important
 } t_etiq;
 
 // Structure pour représenter un token
@@ -31,7 +34,9 @@ void amorcer(char *nom_fichier);
 
 void lire_caractere();
 
-void consommer(char terminal);
+void consommer(t_etiq terminal);
+
+void lire_token();
 
 void passer_espace();
 
@@ -57,7 +62,9 @@ void texte_liste();
 
 void texte();
 
-void mot();
+void mot_riche();
+
+void mot_simple();
 
 void mot_important();
 
