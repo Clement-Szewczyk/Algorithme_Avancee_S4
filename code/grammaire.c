@@ -21,7 +21,7 @@ void amorcer(char *nom_fichier)
         printf("Fichier ouvert avec succès\n");
     }
     lire_caractere(); // Commencer la lecture du fichier
-    lire_token();
+    lire_token();     // Mettre à jour le premier token
 }
 
 // lire un caractère
@@ -59,97 +59,104 @@ void lire_token()
 
     if (mon_caractere == '<')
     {
-        lire_caractere(); // Lire le prochain caractère pour identifier le token
-
-        // Identifier et mettre à jour le token en fonction du caractère courant
-        switch (mon_caractere)
+        // Lire la balise complète jusqu'au '>'
+        char balise[81];
+        int i = 0;
+        lire_caractere(); // Passer '<'
+        while (mon_caractere != '>')
         {
-        case 'd':
-            mon_token.l_etiquette = debut_doc; // Balise <document>
-            break;
-        case 's':
+            balise[i++] = mon_caractere;
             lire_caractere();
-            if (mon_caractere == 'e')
+        }
+        balise[i] = '\0';                    // Ajouter le caractère de fin de chaîne
+        printf("Balise lue : %s\n", balise); // Débogage : afficher la balise lue
+
+        // Identifier et mettre à jour le token en fonction de la balise lue
+        if (balise[0] == '/')
+        {
+            // Balise de fermeture
+            if (strcmp(&balise[1], "document") == 0)
             {
-                mon_token.l_etiquette = debut_section; // Balise <section>
+                mon_token.l_etiquette = fin_doc;
+            }
+            else if (strcmp(&balise[1], "section") == 0)
+            {
+                mon_token.l_etiquette = fin_section;
+            }
+            else if (strcmp(&balise[1], "annexe") == 0)
+            {
+                mon_token.l_etiquette = fin_annexe;
+            }
+            else if (strcmp(&balise[1], "titre") == 0)
+            {
+                mon_token.l_etiquette = fin_titre;
+            }
+            else if (strcmp(&balise[1], "liste") == 0)
+            {
+                mon_token.l_etiquette = fin_liste;
+            }
+            else if (strcmp(&balise[1], "item") == 0)
+            {
+                mon_token.l_etiquette = fin_item;
+            }
+            else if (strcmp(&balise[1], "strong") == 0)
+            {
+                mon_token.l_etiquette = fin_important;
             }
             else
             {
-                mon_token.l_etiquette = debut_important; // Balise <strong>
+                mon_token.l_etiquette = mot_enrichi; // Balise non reconnue, traitée comme un mot enrichi
             }
-            break;
-        case 'a':
-            mon_token.l_etiquette = debut_annexe; // Balise <annexe>
-            break;
-        case 't':
-            mon_token.l_etiquette = debut_titre; // Balise <titre>
-            break;
-        case 'l':
-            mon_token.l_etiquette = debut_liste; // Balise <liste>
-            break;
-        case 'i':
-            mon_token.l_etiquette = debut_item; // Balise <item>
-            break;
-        case '/':
-            lire_caractere();
-            // Cas des balises de fermeture
-            switch (mon_caractere)
-            {
-            case 'd':
-                mon_token.l_etiquette = fin_doc; // Balise </document>
-                break;
-            case 's':
-                lire_caractere();
-                if (mon_caractere == 'e')
-                {
-                    mon_token.l_etiquette = fin_section; // Balise </section>
-                }
-                else
-                {
-                    mon_token.l_etiquette = fin_important; // Balise </strong>
-                }
-                break;
-            case 'a':
-                mon_token.l_etiquette = fin_annexe; // Balise </annexe>
-                break;
-            case 't':
-                mon_token.l_etiquette = fin_titre; // Balise </titre>
-                break;
-            case 'l':
-                mon_token.l_etiquette = fin_liste; // Balise </liste>
-                break;
-            case 'i':
-                mon_token.l_etiquette = fin_item; // Balise </item>
-                break;
-            default:
-                // Autres cas à traiter...
-                break;
-            }
-            lire_token(); // Ajout de cet appel pour avancer au prochain token après avoir identifié la balise de fermeture
-            break;
-        default:
-            mon_token.l_etiquette = mot_enrichi;
-            break;
         }
-    }
+        else
+        {
+            // Balise d'ouverture
+            if (strcmp(balise, "document") == 0)
+            {
+                mon_token.l_etiquette = debut_doc;
+            }
+            else if (strcmp(balise, "section") == 0)
+            {
+                mon_token.l_etiquette = debut_section;
+            }
+            else if (strcmp(balise, "annexe") == 0)
+            {
+                mon_token.l_etiquette = debut_annexe;
+            }
+            else if (strcmp(balise, "titre") == 0)
+            {
+                mon_token.l_etiquette = debut_titre;
+            }
+            else if (strcmp(balise, "liste") == 0)
+            {
+                mon_token.l_etiquette = debut_liste;
+            }
+            else if (strcmp(balise, "item") == 0)
+            {
+                mon_token.l_etiquette = debut_item;
+            }
+            else if (strcmp(balise, "strong") == 0)
+            {
+                mon_token.l_etiquette = debut_important;
+            }
+            else
+            {
+                mon_token.l_etiquette = mot_enrichi; // Balise non reconnue, traitée comme un mot enrichi
+            }
+        }
 
-    // Lire le prochain caractère pour avancer dans le fichier
-    lire_caractere();
+        printf("Étiquette de mon_token après lecture : %d\n", mon_token.l_etiquette); // Débogage : afficher l'étiquette mise à jour
+    }
 }
 
-void consommer(t_etiq terminal)
+void consommer()
 {
     if (mon_caractere == EOF)
     {
         // Si nous atteignons la fin du fichier, ne pas afficher de message d'erreur
         return;
     }
-    if (mon_token.l_etiquette != terminal)
-    {
-        fprintf(stderr, "Erreur : caractère attendu : %d, caractère trouvé : %d\n", terminal, mon_token.l_etiquette);
-        exit(1);
-    }
-    lire_token(); // Consommer le caractère terminal
+    lire_token(); // Mettre à jour le token avant de vérifier le jeton terminal
 }
 
 void passer_espace()
@@ -176,13 +183,16 @@ void text_enrichi()
 void document()
 {
     // Vérifier la présence de la balise d'ouverture du document
+    printf("Étiquette de mon_token : %d\n", mon_token.l_etiquette); // Débogage : afficher l'étiquette stockée dans mon_token
     if (mon_token.l_etiquette != debut_doc)
     {
         fprintf(stderr, "Erreur : balise d'ouverture du document manquante\n");
         exit(1);
     }
     consommer(debut_doc);
-    contenu();
+
+    contenu(); // Traiter le contenu du document
+
     consommer(fin_doc);
 }
 
@@ -198,19 +208,16 @@ void annexes()
 
 void contenu()
 {
-
     if (mon_token.l_etiquette == debut_section)
     {
         section();
     }
     else if (mon_token.l_etiquette == debut_titre)
     {
-
         titre();
     }
     else if (mon_token.l_etiquette == debut_liste)
     {
-
         liste();
     }
     else
@@ -218,6 +225,8 @@ void contenu()
 
         mot_riche();
     }
+
+    lire_caractere(); // Consommer le caractère après avoir traité le contenu
 }
 
 void section()
@@ -246,13 +255,13 @@ void liste()
 
 void item()
 {
-
+    lire_token(); // Mettre à jour le token avant de commencer le traitement
     consommer(debut_item);
     if (mon_token.l_etiquette == item_liste)
     {
         liste_texte();
     }
-    if (mon_token.l_etiquette == item_texte)
+    else if (mon_token.l_etiquette == item_texte)
     {
         texte_liste();
     }
@@ -261,16 +270,22 @@ void item()
 
 void liste_texte()
 {
-
-    liste();
-    texte_liste();
+    // Traiter la liste de mots enrichis
+    mot_riche();
+    if (mon_token.l_etiquette == mot_enrichi)
+    {
+        liste_texte(); // Appel récursif pour le prochain mot enrichi
+    }
 }
 
 void texte_liste()
 {
-
+    // Traiter le texte suivi d'une liste de mots enrichis
     texte();
-    liste_texte();
+    if (mon_token.l_etiquette == mot_enrichi)
+    {
+        liste_texte(); // Appel la fonction pour traiter la liste de mots enrichis
+    }
 }
 
 void texte()
@@ -280,6 +295,7 @@ void texte()
 
 void mot_riche()
 {
+    printf("passe ici");
 
     if (mon_token.l_etiquette == debut_important)
     {
@@ -302,4 +318,5 @@ void mot_important()
 
 void mot_simple()
 {
+    lire_token();
 }

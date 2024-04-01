@@ -34,7 +34,7 @@ void amorcer(char *nom_fichier);
 
 void lire_caractere();
 
-void consommer(t_etiq terminal);
+void consommer();
 
 void lire_token();
 
