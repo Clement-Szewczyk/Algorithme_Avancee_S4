@@ -10,10 +10,9 @@ make
 
 int main()
 {
-    char *nom_fichier = "exemple1.txt"; // Nom du fichier à tester
-    amorcer(nom_fichier);               // Appel de la fonction amorcer avec le nom du fichier
+    char *nom_fichier = "exemple1.txt";
+    amorcer(nom_fichier);
     text_enrichi();
-   
-
+    terminer();
     return 0;
 }

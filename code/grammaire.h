@@ -1,7 +1,6 @@
 #ifndef GRAMMAIRE_H
 #define GRAMMAIRE_H
 
-// Enumération pour les étiquettes des tokens
 typedef enum e_etiq
 {
     debut_doc,
@@ -23,7 +22,6 @@ typedef enum e_etiq
     fin_important
 } t_etiq;
 
-// Structure pour représenter un token
 typedef struct s_token
 {
     t_etiq l_etiquette;
@@ -31,41 +29,27 @@ typedef struct s_token
 } t_token;
 
 void amorcer(char *nom_fichier);
-
+void terminer();
 void lire_caractere();
-
-void consommer();
-
-void lire_token();
-
+void lire_token(t_token *token);
 void passer_espace();
-
+void mettre_a_jour_token(t_token *token, char *balise);
+void consommer(char caractere);
+void consommer_token(char *token_str);
+void fermeture_balise(t_etiq balise_contenante);
 void text_enrichi();
-
 void document();
-
 void annexes();
-
 void contenu();
-
 void section();
-
 void titre();
-
 void liste();
-
 void item();
-
 void liste_texte();
-
 void texte_liste();
-
 void texte();
-
 void mot_riche();
-
-void mot_simple();
-
 void mot_important();
+void mot_simple();
 
 #endif
