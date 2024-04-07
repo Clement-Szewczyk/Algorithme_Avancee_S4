@@ -335,7 +335,7 @@ void liste_texte()
 void texte_liste()
 {
     printf("passe par texte liste\n");
-    // Traiter le texte suivi d'une liste de mots enrichis
+ 
     texte();
     if (mon_token.l_etiquette == mot_enrichi)
     {
@@ -352,7 +352,7 @@ void texte()
 void mot_riche()
 {
     printf("passe par mot riche\n");
-    // Ne pas lire un nouveau token ici
+    
     if (mon_token.l_etiquette == debut_important)
     {
         mot_important();
@@ -361,7 +361,7 @@ void mot_riche()
     {
         mot_simple();
     }
-    // Lire un nouveau token après avoir traité le mot riche
+    
     lire_token(&mon_token);
 }
 
