@@ -4,3 +4,7 @@ make
 
 
 ## Question à poser :
+
+
+
+A faire consommer buffer pour créer token

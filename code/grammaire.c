@@ -13,7 +13,7 @@ t_token mon_token;
 char mon_caractere;
 
 void amorcer(char *nom_fichier)
-{
+{   printf("passe par amorcer\n");
     fichier = fopen(nom_fichier, "r");
     if (fichier == NULL)
     {
@@ -25,28 +25,35 @@ void amorcer(char *nom_fichier)
 
 void terminer()
 {
+    printf("passe par terminer\n");
     fclose(fichier);
 }
 
-void lire_caractere()
+void lire_caractere()//A revoir
 {
+    printf("passe par lire caractere\n");
     if (buffer_index >= buffer_size || buffer_index == 0)
     {
+        printf("Lecture du fichier\n");
         buffer_size = fread(buffer, 1, BUFFER_SIZE, fichier);
         buffer_index = 0;
     }
     if (buffer_size == 0)
-    {
+    {   
+        printf("Fin de fichier\n");
         mon_caractere = EOF;
     }
     else
     {
+        printf("Lecture du caractère (BUFFER) : %c\n", buffer[buffer_index]);
         mon_caractere = buffer[buffer_index++];
     }
 }
 
-void lire_token(t_token *token)
+void lire_token(t_token *token) //Lire Balise et non token
+//A revoir 
 {
+    printf("passe par lire token\n");
     char token_str[20];
     int i = 0;
 
@@ -60,7 +67,7 @@ void lire_token(t_token *token)
         printf("Lecture de la balise : ");
         while (mon_caractere != '>' && mon_caractere != EOF)
         {
-            printf("%c", mon_caractere); // Affichage du caractère actuel
+            printf("%c\n", mon_caractere); // Affichage du caractère actuel
             token_str[i] = mon_caractere;
             lire_caractere();
             i++;
@@ -72,7 +79,7 @@ void lire_token(t_token *token)
         }
         else
         {
-            printf("%c", mon_caractere); // Affichage du chevron '>'
+            
             token_str[i] = '>';
             token_str[i + 1] = '\0';
 
@@ -81,13 +88,14 @@ void lire_token(t_token *token)
 
             // Ignorer les espaces après la balise
             passer_espace();
-
+            
             // Mettre à jour le token
             mettre_a_jour_token(token, token_str);
         }
     }
     else
     {
+       
         // Si ce n'est pas une balise, c'est du texte
         while (mon_caractere != '<' && mon_caractere != EOF)
         {
@@ -104,17 +112,20 @@ void lire_token(t_token *token)
         }
         printf("\n");
 
+        
+
         // Mettre à jour le token avec du texte enrichi
         mettre_a_jour_token(token, "texte_enrichi");
     }
 }
 
-void mettre_a_jour_token(t_token *token, char *token_str)
+void mettre_a_jour_token(t_token *token, char *token_str) //création token
 {
     // Ajouter des messages de débogage
     printf("Mise à jour du token avec la balise : %s\n", token_str);
     if (strcmp(token_str, "<document>") == 0)
     {
+        printf("--------------\n");
         token->l_etiquette = debut_doc;
     }
     else if (strcmp(token_str, "</document>") == 0)
@@ -161,7 +172,7 @@ void mettre_a_jour_token(t_token *token, char *token_str)
     {
         token->l_etiquette = fin_section;
     }
-    else if (strcmp(token_str, "<br/>") == 0)
+    else if (strcmp(token_str, "<br/>") == 0)//Mal géré
     {
         token->l_etiquette = item_texte;
     }
@@ -172,8 +183,10 @@ void mettre_a_jour_token(t_token *token, char *token_str)
     }
 }
 
-void consommer(char caractere)
-{
+void consommer(char caractere) //Mal positionné 
+{   
+    printf("passe par consommer\n");
+    printf("Consommation du caractère : %c\n", caractere);
     if (mon_caractere == caractere)
     {
         lire_caractere(); // Avancer le curseur pour lire le prochain caractère
@@ -181,11 +194,14 @@ void consommer(char caractere)
     else
     {
         printf("Erreur: caractere attendu: %c, caractere trouve: %c\n", caractere, mon_caractere);
+        exit(EXIT_FAILURE);
     }
 }
 
 void consommer_token(char *token_str)
-{
+{   
+    printf("passe par consommer token\n");
+    printf("Consommation du token : %s\n", token_str);
     int i = 0;
     while (token_str[i] != '\0')
     {
@@ -194,8 +210,10 @@ void consommer_token(char *token_str)
     }
 }
 
-void fermeture_balise(t_etiq balise_contenante)
-{
+void fermeture_balise(t_etiq balise_contenante)// peut être sert à rien
+{   
+    printf("passe par fermeture balise\n");
+    printf("Fermeture de la balise : %d\n", balise_contenante);
     if (mon_token.l_etiquette != balise_contenante)
     {
         printf("Erreur: balise de fermeture attendue: %d, balise de fermeture trouvée: %d\n", balise_contenante, mon_token.l_etiquette);
@@ -209,19 +227,23 @@ void fermeture_balise(t_etiq balise_contenante)
 }
 
 void passer_espace()
-{
-    if (mon_caractere == EOF)
+{   
+    
+    printf("passe par passer espace\n");
+    if (mon_caractere == EOF)//faire un truc dédié
     {
         return;
     }
     while (mon_caractere == ' ' || mon_caractere == '\n' || mon_caractere == '\t' || mon_caractere == '\r')
     {
+        printf("Caractère espace : %c\n", mon_caractere);
         lire_caractere(); // Correction : Ne pas passer d'argument
     }
 }
 
 void text_enrichi()
-{
+{   
+    printf("passe par text enrichi\n");
     document();
     annexes();
 }
