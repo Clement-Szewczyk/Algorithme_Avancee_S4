@@ -8,7 +8,7 @@
 char buffer[BUFFER_SIZE];
 int buffer_index = 0;
 FILE *fichier;
-char mon_caractere = ' ';
+char mon_caractere;
 
 
 void ouverture_fichier(char *nom_fichier)
@@ -68,7 +68,7 @@ void creation_item(){
     //Création d'un mot
     if(mon_caractere == ' ' || mon_caractere == '\n' || mon_caractere == '\t' ){//New mot
         //affichage_buffer();
-        printf("\n");
+        //printf("\n");
         creation_token();
         //printf("\n");
         buffer_index = 0;
@@ -88,12 +88,17 @@ void creation_item(){
 
 
 void creation_token(){
-    if(buffer[1] == '<'){
+    int taille = strlen(buffer);
+    printf("Taille : %d\n", taille);
+    printf("%c\n",buffer[1]);
+    printf("%s\n", buffer);
+
+    /*if(buffer[0] == '<'){
         printf("Token : %s\n", buffer);
     }
     else{
         printf("mot : %s\n", buffer);
-    }
+    }*/
    
 }
 
