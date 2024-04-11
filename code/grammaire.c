@@ -119,62 +119,62 @@ void lire_token(t_token *token) //Lire Balise et non token
     }
 }
 
-void mettre_a_jour_token(t_token *token, char *token_str) //création token
+void creation_token(t_token *token, char *token_str) //création token
 {
     // Ajouter des messages de débogage
     printf("Mise à jour du token avec la balise : %s\n", token_str);
     if (strcmp(token_str, "<document>") == 0)
     {
         printf("--------------\n");
-        token->l_etiquette = debut_doc;
+        token->l_etiquette = "debut_doc";
     }
     else if (strcmp(token_str, "</document>") == 0)
     {
-        token->l_etiquette = fin_doc;
+        token->l_etiquette = "fin_doc";
     }
     else if (strcmp(token_str, "<annexe>") == 0)
     {
-        token->l_etiquette = debut_annexe;
+        token->l_etiquette = "debut_annexe";
     }
     else if (strcmp(token_str, "</annexe>") == 0)
     {
-        token->l_etiquette = fin_annexe;
+        token->l_etiquette = "fin_annexe";
     }
     else if (strcmp(token_str, "<titre>") == 0)
     {
-        token->l_etiquette = debut_titre;
+        token->l_etiquette = "debut_titre";
     }
     else if (strcmp(token_str, "</titre>") == 0)
     {
-        token->l_etiquette = fin_titre;
+        token->l_etiquette = "fin_titre";
     }
     else if (strcmp(token_str, "<liste>") == 0)
     {
-        token->l_etiquette = debut_liste;
+        token->l_etiquette = "debut_liste";
     }
     else if (strcmp(token_str, "</liste>") == 0)
     {
-        token->l_etiquette = fin_liste;
+        token->l_etiquette = "fin_liste";
     }
     else if (strcmp(token_str, "<mot_important>") == 0)
     {
-        token->l_etiquette = debut_important;
+        token->l_etiquette = "debut_important";
     }
     else if (strcmp(token_str, "</mot_important>") == 0)
     {
-        token->l_etiquette = fin_important;
+        token->l_etiquette = "fin_important";
     }
     else if (strcmp(token_str, "<section>") == 0)
     {
-        token->l_etiquette = debut_section;
+        token->l_etiquette = "debut_section";
     }
     else if (strcmp(token_str, "</section>") == 0)
     {
-        token->l_etiquette = fin_section;
+        token->l_etiquette = "fin_section";
     }
     else if (strcmp(token_str, "<br/>") == 0)//Mal géré
     {
-        token->l_etiquette = item_texte;
+        token->l_etiquette = "item_texte";
     }
     else
     {

@@ -1,6 +1,35 @@
 #ifndef ANALYSE_H
 #define ANALYSE_H
 
+
+typedef enum e_etiq
+{
+    DEBUT_DOC,
+    FIN_DOC,
+    DEBUT_ANNEXE,
+    FIN_ANNEXE,
+    DEBUT_TITRE,
+    FIN_TITRE,
+    DEBUT_SECTION,
+    FIN_SECTION,
+    DEBUT_LISTE,
+    FIN_LISTE,
+    DEBUT_ITEM,
+    FIN_ITEM,
+    SAUT_LIGNE,
+    MOT
+}t_etiq;
+
+//Tableau image pour l'enumération
+
+extern const char *etiq_str[];
+
+typedef struct s_token
+{
+    t_etiq type;
+    char* la_valeur;
+} t_token;
+
 /*
 * Fonction qui ouvre un fichier
 * @param nom_fichier le nom du fichier à ouvrir
@@ -52,8 +81,13 @@ void creation_item();
 
 void creation_token();
 
+int verification();
+
+void afficher_token();
 
 
 
 
 #endif /* ANALYSE_H */
+
+

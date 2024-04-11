@@ -8,109 +8,174 @@
 char buffer[BUFFER_SIZE];
 int buffer_index = 0;
 FILE *fichier;
-char mon_caractere;
+char mon_caractere = '\0';
+char caractere_avant = '\0';
+t_token token_courant;
 
+// Tableau image des étiquettes
+const char *etiq_str[] = {
+    "DEBUT_DOC",
+    "FIN_DOC",
+    "DEBUT_ANNEXE",
+    "FIN_ANNEXE",
+    "DEBUT_TITRE",
+    "FIN_TITRE",
+    "DEBUT_SECTION",
+    "FIN_SECTION", 
+    "DEBUT_LISTE",
+    "FIN_LISTE",
+    "DEBUT_ITEM",
+    "FIN_ITEM",
+    "SAUT_LIGNE",
+    "MOT"
+};
 
 void ouverture_fichier(char *nom_fichier)
 {   
-    //printf("passe par amorcer\n");
+    buffer_index = 0;
+    memset(buffer, 0, BUFFER_SIZE); // On met le buffer à zéro
+
     fichier = fopen(nom_fichier, "r");
     if (fichier == NULL)
     {
         fprintf(stderr, "Erreur : Impossible d'ouvrir le fichier\n");
         exit(EXIT_FAILURE);
     }
-    creation_item();
+
+    lire_caractere();
 }
 
 void terminer()
 {
-    //printf("passe par terminer\n");
+    printf("passe par terminer\n");
     fclose(fichier);
-    printf("ADIEU\n");
-    
     exit(EXIT_SUCCESS);
 }
 
 void passer_espace(){
-    //Passe les espaces
-    //printf("passe par passer espace\n");
-    creation_item();
+    if(mon_caractere == ' ' || mon_caractere == '\n' ||  mon_caractere == '\r' || mon_caractere == '\t'){
+        lire_caractere();
+        creation_item();
+    }
     
 }
 
 
 void lire_caractere(){
-    //Lit un caractère du fichier
-    //printf("passe par lire caractere\n");
-    //printf("%c", fgetc(fichier));
     mon_caractere = fgetc(fichier);
-    //printf("Lecture du caractère : %c\n", mon_caractere);
-
-    if(mon_caractere == EOF)
-    {   
-        
-        //affichage_buffer();
-        creation_token();
-        printf("\n");
-        terminer();
-    }
-    else{
-        //mon_caractere = fgetc(fichier);
-        creation_item();
-        //printf("Lecture du caractère : %c\n", mon_caractere);
-    }
     
-}
-
-void creation_item(){
-    
-    //Création d'un mot
-    if(mon_caractere == ' ' || mon_caractere == '\n' || mon_caractere == '\t' ){//New mot
-        //affichage_buffer();
-        //printf("\n");
-        creation_token();
-        //printf("\n");
-        buffer_index = 0;
-        //printf("Nouveau mot\n");
-        memset(buffer, 0, BUFFER_SIZE);
-        buffer[buffer_index] = mon_caractere;
-        buffer_index++;
-        lire_caractere();
-    }
-    else{
         
-        buffer[buffer_index] = mon_caractere;
-        buffer_index++;
-        lire_caractere();
-    }   
 }
 
 
-void creation_token(){
-    int taille = strlen(buffer);
-    printf("Taille : %d\n", taille);
-    printf("%c\n",buffer[1]);
-    printf("%s\n", buffer);
-
-    /*if(buffer[0] == '<'){
-        printf("Token : %s\n", buffer);
+int verification(){
+    if(mon_caractere != ' ' && mon_caractere != '\n'&& mon_caractere != '\r' && mon_caractere != '\t' && mon_caractere != EOF){
+        return 1;
     }
     else{
-        printf("mot : %s\n", buffer);
-    }*/
-   
+        return 0;
+    }
+}
+
+void creation_item() {
+    
+    memset(buffer, 0, BUFFER_SIZE);
+    buffer_index = 0;
+
+    while (verification() == 1){
+        buffer[buffer_index] = mon_caractere;
+        buffer_index++;
+        caractere_avant = mon_caractere;
+        lire_caractere();
+    }
+    if(strlen(buffer)>1 ){
+        creation_token();
+        afficher_token();
+    }
+    
+    passer_espace();
+
+}
+
+
+
+
+void creation_token() //création token
+{
+    // On vérifie si le token_courant.la_valeur est plein
+    if(token_courant.la_valeur != NULL){
+        free(token_courant.la_valeur);
+        token_courant.la_valeur = NULL;
+    }
+    
+    // Association des types de token
+    if (strcmp(buffer, "<document>") == 0)
+    {
+        token_courant.type = DEBUT_DOC; 
+    }
+    else if(strcmp(buffer, "</document>") == 0)
+    {
+        token_courant.type = FIN_DOC;
+    }
+    else if(strcmp(buffer, "<annexe>") == 0){
+        token_courant.type = DEBUT_ANNEXE;
+    }
+    else if(strcmp(buffer, "</annexe>") == 0){
+        token_courant.type = FIN_ANNEXE;
+    }
+    else if(strcmp(buffer, "<titre>") == 0){
+        token_courant.type = DEBUT_TITRE;
+    }
+    else if(strcmp(buffer, "</titre>") == 0){
+        token_courant.type = FIN_TITRE;
+    }
+    else if(strcmp(buffer, "<section>") == 0){
+        token_courant.type = DEBUT_SECTION;
+    }
+    else if(strcmp(buffer, "</section>") == 0){
+        token_courant.type = FIN_SECTION;
+    }
+    else if(strcmp(buffer, "<liste>") == 0){
+        token_courant.type = DEBUT_LISTE;
+    }
+    else if(strcmp(buffer, "</liste>") == 0){
+        token_courant.type = FIN_LISTE;
+    }
+    else if(strcmp(buffer, "<item>") == 0){
+        token_courant.type = DEBUT_ITEM;
+    }
+    else if(strcmp(buffer, "</item>") == 0){
+        token_courant.type = FIN_ITEM;
+    }
+    else if(strcmp(buffer, "</br>") == 0){
+        token_courant.type = SAUT_LIGNE;
+    }
+    else{
+        token_courant.type = MOT;
+        token_courant.la_valeur = malloc(sizeof(char) * (strlen(buffer) + 1));
+        sprintf(token_courant.la_valeur, "%s", buffer);// strdup(buffer);
+    }
+
+    
 }
 
 void affichage_buffer(){
-    //printf("affichage buffer\n");
-    //Affiche le buffer
-    //printf("passe par affichage buffer\n");
-    //printf("Buffer : %s\n", buffer);
-    
-    for(int i = 0; i < BUFFER_SIZE; i++){
-        //printf("%d", i);
+    int taille = strlen(buffer);
+    for (int i = 0; i < taille; i++) {
         printf("%c", buffer[i]);
     }
-   
+    printf("\n");
 }
+
+void afficher_token(){
+    printf("Type : %s", etiq_str[token_courant.type]);
+    if(token_courant.la_valeur != NULL){
+        printf("  -> Valeur : %s", token_courant.la_valeur);
+    }
+    printf("\n");
+
+}
+
+
+
+
