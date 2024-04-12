@@ -16,6 +16,8 @@ typedef enum e_etiq
     FIN_LISTE,
     DEBUT_ITEM,
     FIN_ITEM,
+    DEBUT_IMPORTANT,
+    FIN_IMPORTANT,
     SAUT_LIGNE,
     MOT
 }t_etiq;
@@ -85,8 +87,36 @@ int verification();
 
 void afficher_token();
 
+void consommer_token();
 
+//Grammaire
+void Text_enrichi();
 
+void Document();
+
+void Annexe();
+
+void contenu();
+
+void section();
+
+void titre();
+
+void mot_enrichi();
+
+void liste();
+
+void texte();
+
+void mot_simple();
+
+void mot_important();
+
+void item();
+
+void texte_liste();
+
+void liste_texte();
 
 #endif /* ANALYSE_H */
 

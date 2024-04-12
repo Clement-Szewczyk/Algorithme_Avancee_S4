@@ -14,20 +14,22 @@ t_token token_courant;
 
 // Tableau image des étiquettes
 const char *etiq_str[] = {
-    "DEBUT_DOC",
-    "FIN_DOC",
-    "DEBUT_ANNEXE",
-    "FIN_ANNEXE",
-    "DEBUT_TITRE",
-    "FIN_TITRE",
-    "DEBUT_SECTION",
-    "FIN_SECTION", 
-    "DEBUT_LISTE",
-    "FIN_LISTE",
-    "DEBUT_ITEM",
-    "FIN_ITEM",
-    "SAUT_LIGNE",
-    "MOT"
+    "<document>",
+    "</document>",
+    "<annexe>",
+    "</annexe>",
+    "<titre>",
+    "</titre>",
+    "<section>",
+    "</section>",
+    "<liste>",
+    "</liste>",
+    "<item>",
+    "</item>",
+    "<debut_important>",
+    "</fin_important>",
+    "</br>",
+    "mot"    
 };
 
 void ouverture_fichier(char *nom_fichier)
@@ -62,7 +64,11 @@ void passer_espace(){
 
 
 void lire_caractere(){
+    
     mon_caractere = fgetc(fichier);
+    if(mon_caractere == EOF){
+        return;
+    }// à revoir
     
         
 }
@@ -78,22 +84,26 @@ int verification(){
 }
 
 void creation_item() {
-    
+    //printf("passe par creation item\n");
     memset(buffer, 0, BUFFER_SIZE);
     buffer_index = 0;
 
     while (verification() == 1){
         buffer[buffer_index] = mon_caractere;
         buffer_index++;
-        caractere_avant = mon_caractere;
+        //caractere_avant = mon_caractere;
         lire_caractere();
     }
-    if(strlen(buffer)>1 ){
+    if(strlen(buffer)>=1){  // ATTENTION il existe des trucs avec un seul caractère comme ":"
         creation_token();
-        afficher_token();
+        affichage_buffer();
+        //afficher_token();
+        Text_enrichi();//????
     }
-    
+    //printf("Token créee\n");
     passer_espace();
+
+
 
 }
 
@@ -102,6 +112,7 @@ void creation_item() {
 
 void creation_token() //création token
 {
+    //printf("passe par creation token\n");
     // On vérifie si le token_courant.la_valeur est plein
     if(token_courant.la_valeur != NULL){
         free(token_courant.la_valeur);
@@ -151,15 +162,15 @@ void creation_token() //création token
         token_courant.type = SAUT_LIGNE;
     }
     else{
+        
         token_courant.type = MOT;
         token_courant.la_valeur = malloc(sizeof(char) * (strlen(buffer) + 1));
         sprintf(token_courant.la_valeur, "%s", buffer);// strdup(buffer);
     }
-
-    
 }
 
 void affichage_buffer(){
+    printf("Buffer : ");
     int taille = strlen(buffer);
     for (int i = 0; i < taille; i++) {
         printf("%c", buffer[i]);
@@ -176,6 +187,182 @@ void afficher_token(){
 
 }
 
+/*void consommer_token(char *balise){
+    //printf("passe par consommer token\n");
+    printf("Type : %s\n", etiq_str[token_courant.type]);
+    printf("Balise : %s\n", balise);
+    if(strcmp(etiq_str[token_courant.type], balise) == 0){ // ???
+        free(token_courant.la_valeur);
+        token_courant.la_valeur = NULL;
+        printf("-----------\n");
+        passer_espace();
+        creation_item();
+    }
+}*/
+
+
+void consommer_token_type(t_etiq attendu){
+    //printf("passe par consommer token type\n");
+    if (token_courant.type != attendu){
+        fprintf(stderr, "Erreur : balise attendue %s\n", etiq_str[attendu]);
+    }
+    if(token_courant.type == attendu){
+        //printf("J'ai consommé %s\n", etiq_str[attendu]);
+        printf("-----------\n");
+        creation_item();
+    }
+    /*if (attendu == MOT){
+        if(token_courant.la_valeur != NULL){
+            Erreur ?????
+        }
+    }*/
+
+}
 
 
 
+
+/*void consommer_token_aux(t_token attendu){
+    if (si c'est pas le token attendu -> erreur ){
+        fprintf(stderr, "Erreur : balise attendue %s\n", etiq_str[attendu.type]);
+    }
+    if (token_courant.la_valeur != NULL){
+        free(token_courant.la_valeur);
+        token_courant.la_valeur = NULL;
+    }
+    creation_item();
+}*/
+
+// GRAMMAIRE : 
+
+void Text_enrichi(){
+    //printf("passe par Text_enrichi\n");
+    Document();
+    Annexe();
+    //exit(EXIT_SUCCESS);
+}
+
+void Document(){
+    //printf("passe par document\n");
+    // Consomme début document
+    
+    consommer_token_type(DEBUT_DOC);
+
+    contenu();
+    //Consomme fin document
+    
+    consommer_token_type(FIN_DOC);
+
+}
+
+
+void Annexe(){
+    //printf("passe par annexe\n");
+    while (token_courant.type == DEBUT_ANNEXE){
+        consommer_token_type(DEBUT_ANNEXE);
+        contenu();
+        consommer_token_type(FIN_ANNEXE);
+    }
+}
+
+void contenu(){
+    //printf("passe par contenu\n");
+    while (token_courant.type == DEBUT_SECTION || token_courant.type == DEBUT_TITRE || token_courant.type == MOT || token_courant.type == DEBUT_LISTE ||token_courant.type == FIN_SECTION || token_courant.type == FIN_TITRE || token_courant.type == FIN_LISTE || token_courant.type == DEBUT_ITEM || token_courant.type == FIN_ITEM || token_courant.type == DEBUT_IMPORTANT || token_courant.type == FIN_IMPORTANT || token_courant.type == SAUT_LIGNE){                                         
+        if (token_courant.type == DEBUT_SECTION || token_courant.type == FIN_SECTION){
+            section();}
+        else if (token_courant.type == DEBUT_TITRE || token_courant.type == FIN_TITRE){
+            titre();}
+        else if (token_courant.type == MOT ){
+            mot_enrichi();}
+        else if (token_courant.type == DEBUT_LISTE || token_courant.type == FIN_LISTE || token_courant.type == DEBUT_ITEM || token_courant.type == FIN_ITEM){
+            liste();}      
+    }
+    
+}
+
+void section(){
+    //printf("passe par section\n");
+    if(token_courant.type == FIN_SECTION){
+        consommer_token_type(FIN_SECTION);
+        return;
+    }
+    consommer_token_type(DEBUT_SECTION);
+    contenu();
+    
+}
+
+void titre(){
+    //printf("passe par titre\n");
+    consommer_token_type(DEBUT_TITRE);
+    texte();
+    consommer_token_type(FIN_TITRE);
+}
+
+void mot_enrichi(){
+    //printf("passe par mot_enrichi\n");
+    if (token_courant.type == MOT){
+        mot_simple();
+    }
+    else if (token_courant.type == DEBUT_IMPORTANT){
+        mot_important();
+    }
+    else if (token_courant.type == SAUT_LIGNE){
+        consommer_token_type(SAUT_LIGNE);
+    }
+}
+
+void liste(){
+    //printf("passe par liste\n");
+    consommer_token_type(DEBUT_LISTE);
+    while (token_courant.type == DEBUT_ITEM || token_courant.type == FIN_ITEM){
+        item();
+    }
+    consommer_token_type(FIN_LISTE);
+}
+
+void item(){
+    //printf("passe par item\n");
+    consommer_token_type(DEBUT_ITEM);
+    if (token_courant.type == DEBUT_LISTE)
+        liste_texte();
+    else if (token_courant.type == MOT)
+        texte_liste();
+    consommer_token_type(FIN_ITEM);
+}
+
+void liste_texte(){
+    //printf("passe par liste_texte\n");
+    liste();
+    texte_liste();
+}
+
+void texte_liste(){
+    //printf("passe par texte_liste\n");
+    texte();
+    liste_texte();
+}
+
+void texte(){
+    //printf("passe par texte\n");
+    while (token_courant.type == MOT){
+        mot_enrichi();
+    }
+}
+
+
+void mot_simple(){
+    //printf("passe par mot_simple\n");
+    if (token_courant.type == MOT){
+        
+        consommer_token_type(MOT);
+    }
+}
+
+void mot_important(){
+    consommer_token_type(DEBUT_IMPORTANT);
+    while (token_courant.type == MOT){
+        mot_simple();
+            
+    }
+    consommer_token_type(FIN_IMPORTANT);
+}
