@@ -1,18 +1,10 @@
-/*
-cd Algorithme_Avancee_S4/code/
-make
-./grammaire
-*/
-
 #include <stdio.h>
-#include <stdlib.h>
-#include "grammaire.h"
+#include "analyse.h"
 
-int main()
-{
-    char *nom_fichier = "exemple1.txt";
-    amorcer(nom_fichier);
-    text_enrichi();
+int main() {
+    ouverture_fichier("exemple.txt");
+    creation_item();
+
     terminer();
     return 0;
 }

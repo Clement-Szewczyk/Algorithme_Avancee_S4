@@ -1,9 +1,56 @@
 <document>
+    <titre> Sujet de projet Nanoml  </titre>
     <section>
-        <titre> Sujet de projet Nanoml </titre>
+        <titre> Grammaire </titre>
+        inspiree par la forme BN.
+        <liste>
+            <item> texte_enrichi ::= document annexes </item>
+            <item> document ::= 'debut_doc' contenu 'fin_doc' </item>
+            <item> annexes ::= { 'debut_annexe' contenu 'fin_annexe' } </item>
+            <item> ... </item>
+        </liste>
+    </section>
+    <section>
+        <titre> Demarche du projet </titre>
+        <liste>
+            <item> Ecrire une permiere version de l'analyseur gerant les balises
+                <liste>
+                    <item> document </item>
+                    <item> annexe </item>
+                    <item> section </item>
+                    <item> et le texte </item>
+                </liste>
+            </item>
+            <item> Decorer l'analyseur pour que l'arbre N-aire soit creer
+                <liste>
+                    <item> Ajouter les parametres necessaire aux fonctions </item>
+                    <item> Manipuler les noeuds de l'arbre </item>
+                    <item> reprendre le programme pour qu'il soit maintenable/reutilisable </item>
+                    <item> reutiliser le travail sur les arbres
+                        <liste>
+                            <item> utils </item>
+                            <item> noeud </item>
+                            <item> (arbre_binaire peut aider) </item>
+                        </liste>
+                    </item>
+                </liste>
+            </item>
+            <item> Afficher l'arbre N-aire
+                <liste>
+                    <item> Definir les routines necessaires </item>
+                    <item> Repartir dans des bonnes bibliotheques </item>
+                    <item> obtenir un rendu </item>
+                </liste>
+            </item>
+            <item> Ajouter ce qui manque
+                <liste>
+                    <item> les titres </item>
+                    <item> les balises retour_a_la_ligne </item>
+                    <item> les balises "important" </item>
+                    <item> listes et items (Danger) </item>
+                </liste>
+            </item>
+            <item> Envisager des extensions </item>
+        </liste>
     </section>
 </document>
-<annexe>
-    Auteur : Weinberg Benjamin <br/>
-    Date : 23/01/2024 <br/>
-</annexe>
