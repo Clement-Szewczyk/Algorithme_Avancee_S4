@@ -10,7 +10,6 @@ char buffer[BUFFER_SIZE];
 int buffer_index = 0;
 FILE *fichier;
 char mon_caractere = '\0';
-char caractere_avant = '\0';
 t_token token_courant;
 bool fin_fichier = false;
 
@@ -51,7 +50,7 @@ void ouverture_fichier(char *nom_fichier)
 
 void terminer()
 {
-    printf("passe par terminer\n");
+    printf("FIN\n");
     fclose(fichier);
     exit(EXIT_SUCCESS);
 }
@@ -70,7 +69,7 @@ void lire_caractere(){
     mon_caractere = fgetc(fichier);
     if(mon_caractere == EOF){
         return;
-    }// à revoir
+    }
     
         
 }
@@ -93,16 +92,14 @@ void creation_item() {
     while (verification() == 1){
         buffer[buffer_index] = mon_caractere;
         buffer_index++;
-        //caractere_avant = mon_caractere;
         lire_caractere();
     }
-    if(strlen(buffer)>=1){  // ATTENTION il existe des trucs avec un seul caractère comme ":"
+    if(strlen(buffer)>=1){
         creation_token();
         affichage_buffer();
         
-        Text_enrichi();//????
+        Text_enrichi();
     }
-    //printf("Token créee\n");
     passer_espace();
 
 
@@ -112,7 +109,6 @@ void creation_item() {
 
 void creation_token() //création token
 {
-    //printf("passe par creation token\n");
     // On vérifie si le token_courant.la_valeur est plein
     if(token_courant.la_valeur != NULL){
         free(token_courant.la_valeur);
@@ -190,17 +186,15 @@ void afficher_token(){
 
 
 void consommer_token_type(t_etiq attendu){
-    //printf("passe par consommer token type\n");
-    printf("Consommme : %s\n", etiq_str[token_courant.type]);
     if (token_courant.type != attendu){
         fprintf(stderr, "Erreur : balise attendue %s\n", etiq_str[attendu]);
     }
     if(token_courant.type == attendu){
-        //printf("J'ai consommé %s\n", etiq_str[attendu]);
+        printf("J'ai consommé %s\n", etiq_str[attendu]);
         printf("-----------\n");
         creation_item();
         if(strlen(buffer) == 0){
-            printf("*****************************\n");
+           
             terminer();
         }
         
@@ -214,8 +208,6 @@ void consommer_token_type(t_etiq attendu){
 
 void Text_enrichi(){
     //printf("passe par Text_enrichi\n");
-    printf("token courant : %s\n", etiq_str[token_courant.type]);
-    printf("fin fichier : %d\n", fin_fichier);
     if(fin_fichier == true || token_courant.type == DEBUT_ANNEXE){
         if(strlen(buffer) == 0){
             fin_fichier = false;
@@ -229,7 +221,7 @@ void Text_enrichi(){
 }
 
 void Document(){
-    printf("passe par document\n");
+   // printf("passe par document\n");
     // Consomme début document
     
     consommer_token_type(DEBUT_DOC);
@@ -243,15 +235,12 @@ void Document(){
 
 
 void Annexe(){
-    //printf("passe par annexe\n");
     
     while (token_courant.type == DEBUT_ANNEXE||token_courant.type == FIN_ANNEXE){
-        //printf("******************\n");
         fin_fichier = true;
         consommer_token_type(DEBUT_ANNEXE);
         
         contenu();
-        printf("FIN ANNEXE: %s\n", etiq_str[token_courant.type]);
         consommer_token_type(FIN_ANNEXE); 
         
         
