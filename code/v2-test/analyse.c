@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "analyse.h"
 
 // Variables globales
@@ -11,6 +12,7 @@ FILE *fichier;
 char mon_caractere = '\0';
 char caractere_avant = '\0';
 t_token token_courant;
+bool fin_fichier = false;
 
 // Tableau image des étiquettes
 const char *etiq_str[] = {
@@ -97,7 +99,7 @@ void creation_item() {
     if(strlen(buffer)>=1){  // ATTENTION il existe des trucs avec un seul caractère comme ":"
         creation_token();
         affichage_buffer();
-        //afficher_token();
+        
         Text_enrichi();//????
     }
     //printf("Token créee\n");
@@ -106,8 +108,6 @@ void creation_item() {
 
 
 }
-
-
 
 
 void creation_token() //création token
@@ -187,22 +187,11 @@ void afficher_token(){
 
 }
 
-/*void consommer_token(char *balise){
-    //printf("passe par consommer token\n");
-    printf("Type : %s\n", etiq_str[token_courant.type]);
-    printf("Balise : %s\n", balise);
-    if(strcmp(etiq_str[token_courant.type], balise) == 0){ // ???
-        free(token_courant.la_valeur);
-        token_courant.la_valeur = NULL;
-        printf("-----------\n");
-        passer_espace();
-        creation_item();
-    }
-}*/
 
 
 void consommer_token_type(t_etiq attendu){
     //printf("passe par consommer token type\n");
+    printf("Consommme : %s\n", etiq_str[token_courant.type]);
     if (token_courant.type != attendu){
         fprintf(stderr, "Erreur : balise attendue %s\n", etiq_str[attendu]);
     }
@@ -210,40 +199,37 @@ void consommer_token_type(t_etiq attendu){
         //printf("J'ai consommé %s\n", etiq_str[attendu]);
         printf("-----------\n");
         creation_item();
-    }
-    /*if (attendu == MOT){
-        if(token_courant.la_valeur != NULL){
-            Erreur ?????
+        if(strlen(buffer) == 0){
+            printf("*****************************\n");
+            terminer();
         }
-    }*/
-
+        
+    }
 }
 
 
 
-
-/*void consommer_token_aux(t_token attendu){
-    if (si c'est pas le token attendu -> erreur ){
-        fprintf(stderr, "Erreur : balise attendue %s\n", etiq_str[attendu.type]);
-    }
-    if (token_courant.la_valeur != NULL){
-        free(token_courant.la_valeur);
-        token_courant.la_valeur = NULL;
-    }
-    creation_item();
-}*/
 
 // GRAMMAIRE : 
 
 void Text_enrichi(){
     //printf("passe par Text_enrichi\n");
+    printf("token courant : %s\n", etiq_str[token_courant.type]);
+    printf("fin fichier : %d\n", fin_fichier);
+    if(fin_fichier == true || token_courant.type == DEBUT_ANNEXE){
+        if(strlen(buffer) == 0){
+            fin_fichier = false;
+        }
+        Annexe();
+    }
     Document();
-    Annexe();
+    
+    
     //exit(EXIT_SUCCESS);
 }
 
 void Document(){
-    //printf("passe par document\n");
+    printf("passe par document\n");
     // Consomme début document
     
     consommer_token_type(DEBUT_DOC);
@@ -258,10 +244,18 @@ void Document(){
 
 void Annexe(){
     //printf("passe par annexe\n");
-    while (token_courant.type == DEBUT_ANNEXE){
+    
+    while (token_courant.type == DEBUT_ANNEXE||token_courant.type == FIN_ANNEXE){
+        //printf("******************\n");
+        fin_fichier = true;
         consommer_token_type(DEBUT_ANNEXE);
+        
         contenu();
-        consommer_token_type(FIN_ANNEXE);
+        printf("FIN ANNEXE: %s\n", etiq_str[token_courant.type]);
+        consommer_token_type(FIN_ANNEXE); 
+        
+        
+        
     }
 }
 

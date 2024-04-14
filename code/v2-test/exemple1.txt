@@ -2,7 +2,11 @@
     <section>
         Bonjour le Monde.
     </section>
-<document>
+</document>
+<annexe>
+    Auteur : Weinberg Benjamin
+    Date : 23/01/2024
+</annexe>
 <annexe>
     Auteur : Weinberg Benjamin
     Date : 23/01/2024
